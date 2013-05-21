@@ -95,6 +95,9 @@ namespace NLua
 		//private object luaLock = new object();
 		private bool _StatePassed;
 		private bool executing;
+
+		private Queue<int> releasedReferences = new Queue<int>();
+
 		static string init_luanet =
 			"local metatable = {}														\n" +
 				"local import_type = luanet.import_type										\n" +
@@ -320,7 +323,12 @@ end
 				LuaCore.lua_close (luaState);
 				ObjectTranslatorPool.Instance.Remove (luaState);
 			}
-			//luaState = LuaCore.lua_State.Zero; <- suggested by Christopher Cebulski http://luaforge.net/forum/forum.php?thread_id = 44593&forum_id = 146
+
+			luaState = new LuaCore.lua_State(); // <- suggested by Christopher Cebulski http://luaforge.net/forum/forum.php?thread_id = 44593&forum_id = 146
+
+			lock (releasedReferences) {
+				releasedReferences.Clear ();
+			}
 		}
 
 #if MONOTOUCH
@@ -446,6 +454,8 @@ end
 			int oldTop = LuaLib.lua_gettop(luaState);
 			executing = true;
 
+			unrefReleasedReferences ();
+
 			if (LuaLib.luaL_loadbuffer(luaState, chunk, chunkName) == 0)
 			{
 				try
@@ -477,6 +487,8 @@ end
 			int oldTop = LuaLib.lua_gettop(luaState);
 			executing = true;
 
+			unrefReleasedReferences ();
+
 			if (LuaLib.luaL_loadbuffer(luaState, chunk, chunkName) == 0)
 			{
 				try
@@ -504,6 +516,8 @@ end
 		public object[] DoFile (string fileName)
 		{
 			int oldTop = LuaLib.lua_gettop (luaState);
+
+			unrefReleasedReferences ();
 
 			if (LuaLib.luaL_loadfile (luaState, fileName) == 0) {
 				executing = true;
@@ -1045,8 +1059,22 @@ end
 
 		internal void dispose (int reference)
 		{
-			if (!luaState.IsNull ()) //Fix submitted by Qingrui Li
-				LuaLib.lua_unref (luaState, reference);
+			if (!luaState.IsNull ()) {
+				lock (releasedReferences) {
+					releasedReferences.Enqueue(reference);
+				}
+			}
+		}
+
+		private void unrefReleasedReferences ()
+		{
+			if (!luaState.IsNull ()) {
+				lock (releasedReferences) {
+					while (releasedReferences.Count != 0) {
+						LuaLib.lua_unref (luaState, releasedReferences.Dequeue ());
+					}
+				}
+			}
 		}
 
 		/*
