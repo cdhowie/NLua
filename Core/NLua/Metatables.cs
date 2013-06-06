@@ -148,9 +148,13 @@ namespace NLua
 		{
 			object obj = translator.getRawNetObject (luaState, 1);
 
-			if (!obj.IsNull ())
-				translator.push (luaState, obj.ToString () + ": " + obj.GetHashCode ());
-			else
+			if (!obj.IsNull ()) {
+				if (translator.interpreter.ManagedObjectSecurityPolicy.PermitAccessToObject(obj)) {
+					translator.push (luaState, obj.ToString () + ": " + obj.GetHashCode ());
+				} else {
+					translator.push (luaState, obj.GetType().Name);
+				}
+			} else
 				LuaLib.lua_pushnil (luaState);
 
 			return 1;
@@ -206,6 +210,11 @@ namespace NLua
 		private int getMethodInternal (LuaCore.lua_State luaState)
 		{
 			object obj = translator.getRawNetObject (luaState, 1);
+
+			if (!translator.interpreter.ManagedObjectSecurityPolicy.PermitAccessToObject(obj)) {
+				LuaLib.lua_pushnil(luaState);
+				return 1;
+			}
 
 			if (obj.IsNull ()) {
 				translator.throwError (luaState, "trying to index an invalid object reference");
@@ -307,6 +316,12 @@ namespace NLua
 		private int getBaseMethodInternal (LuaCore.lua_State luaState)
 		{
 			object obj = translator.getRawNetObject (luaState, 1);
+
+			if (!translator.interpreter.ManagedObjectSecurityPolicy.PermitAccessToObject(obj)) {
+				LuaLib.lua_pushnil(luaState);
+				LuaLib.lua_pushboolean(luaState, false);
+				return 2;
+			}
 
 			if (obj.IsNull ()) {
 				translator.throwError (luaState, "trying to index an invalid object reference");
@@ -530,6 +545,10 @@ namespace NLua
  		{
 			object target = translator.getRawNetObject (luaState, 1);
 
+			if (!translator.interpreter.ManagedObjectSecurityPolicy.PermitAccessToObject(target)) {
+				return 0;
+			}
+
 			if (target.IsNull ()) {
 				translator.throwError (luaState, "trying to index and invalid object reference");
 				return 0;
@@ -719,6 +738,11 @@ namespace NLua
 				translator.push (luaState, Array.CreateInstance (klass.UnderlyingSystemType, size));
 				return 1;
 			} else {
+				if (!translator.interpreter.ManagedObjectSecurityPolicy.PermitAccessToStaticMembers(klass.UnderlyingSystemType)) {
+					LuaLib.lua_pushnil(luaState);
+					return 1;
+				}
+
 				string methodName = LuaLib.lua_tostring (luaState, 2).ToString ();
 
 				if (methodName.IsNull ()) {
@@ -755,6 +779,10 @@ namespace NLua
 			} else
 				target = (IReflect)obj;
 
+			if (!translator.interpreter.ManagedObjectSecurityPolicy.PermitAccessToStaticMembers(target.UnderlyingSystemType)) {
+				return 0;
+			}
+
 			return setMember (luaState, target, null, BindingFlags.FlattenHierarchy | BindingFlags.Static | BindingFlags.IgnoreCase);
 		}
 
@@ -787,6 +815,11 @@ namespace NLua
 				return 1;
 			} else
 				klass = (IReflect)obj;
+
+			if (!translator.interpreter.ManagedObjectSecurityPolicy.PermitObjectConstruction(klass.UnderlyingSystemType)) {
+				LuaLib.lua_pushnil(luaState);
+				return 1;
+			}
 
 			LuaLib.lua_remove (luaState, 1);
 			var constructors = klass.UnderlyingSystemType.GetConstructors ();

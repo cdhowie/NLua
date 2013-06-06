@@ -103,7 +103,9 @@ FILES = \
 	LuaLib/GCOptions.cs \
 	LuaLib/LuaLib.cs \
 	Config/NLuaConfig.cs \
-	ObjectTranslatorPool.cs 
+	ObjectTranslatorPool.cs \
+	IManagedObjectSecurityPolicy.cs \
+	SimpleManagedObjectSecurityPolicy.cs
 
 DATA_FILES = 
 

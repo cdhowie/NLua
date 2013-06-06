@@ -98,6 +98,14 @@ namespace NLua
 
 		private Queue<int> releasedReferences = new Queue<int>();
 
+		private IManagedObjectSecurityPolicy managedObjectSecurityPolicy = SimpleManagedObjectSecurityPolicy.PermitAll;
+
+		public IManagedObjectSecurityPolicy ManagedObjectSecurityPolicy
+		{
+			get { return managedObjectSecurityPolicy; }
+			set { managedObjectSecurityPolicy = value ?? SimpleManagedObjectSecurityPolicy.PermitAll; }
+		}
+
 		static string init_luanet =
 			"local metatable = {}														\n" +
 				"local import_type = luanet.import_type										\n" +

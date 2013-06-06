@@ -90,6 +90,8 @@
     <Compile Include="ObjectTranslatorPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProxyType.cs" />
+    <Compile Include="IManagedObjectSecurityPolicy.cs" />
+    <Compile Include="SimpleManagedObjectSecurityPolicy.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\KopiLua\KopiLua\KopiLua-wp7.csproj">
