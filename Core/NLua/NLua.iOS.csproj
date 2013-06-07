@@ -86,6 +86,7 @@
     <Compile Include="ObjectTranslatorPool.cs" />
     <Compile Include="IManagedObjectSecurityPolicy.cs" />
     <Compile Include="SimpleManagedObjectSecurityPolicy.cs" />
+    <Compile Include="IManagedObjectSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\KeraLua\src\KeraLua.iOS.csproj">

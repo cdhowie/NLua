@@ -92,6 +92,7 @@
     <Compile Include="ProxyType.cs" />
     <Compile Include="IManagedObjectSecurityPolicy.cs" />
     <Compile Include="SimpleManagedObjectSecurityPolicy.cs" />
+    <Compile Include="IManagedObjectSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\KopiLua\KopiLua\KopiLua-wp7.csproj">

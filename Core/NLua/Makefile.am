@@ -105,7 +105,8 @@ FILES = \
 	Config/NLuaConfig.cs \
 	ObjectTranslatorPool.cs \
 	IManagedObjectSecurityPolicy.cs \
-	SimpleManagedObjectSecurityPolicy.cs
+	SimpleManagedObjectSecurityPolicy.cs \
+	IManagedObjectSerializer.cs
 
 DATA_FILES = 
 

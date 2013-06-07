@@ -106,6 +106,8 @@ namespace NLua
 			set { managedObjectSecurityPolicy = value ?? SimpleManagedObjectSecurityPolicy.PermitAll; }
 		}
 
+		public IManagedObjectSerializer ManagedObjectSerializer { get; set; }
+
 		static string init_luanet =
 			"local metatable = {}														\n" +
 				"local import_type = luanet.import_type										\n" +
