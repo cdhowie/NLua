@@ -539,11 +539,13 @@ namespace NLua
 		{
 			int index = -1;
 
-			var serializer = interpreter.ManagedObjectSerializer;
-			object serializedObject;
-			if (serializer != null && serializer.Serialize(interpreter, o, out serializedObject)) {
-				push(luaState, serializedObject);
-				return;
+			if (metatable == "luaNet_metatable") {
+				var serializer = interpreter.ManagedObjectSerializer;
+				object serializedObject;
+				if (serializer != null && serializer.Serialize(interpreter, o, out serializedObject)) {
+					push(luaState, serializedObject);
+					return;
+				}
 			}
 
 			// Pushes nil
