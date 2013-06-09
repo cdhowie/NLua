@@ -1203,9 +1203,14 @@ end
 			}
 
 			this.Close ();
-			GC.Collect ();
-			GC.WaitForPendingFinalizers ();
+
+			GC.SuppressFinalize (this);
 		}
 		#endregion
+
+		~Lua()
+		{
+			Dispose();
+		}
 	}
 }
