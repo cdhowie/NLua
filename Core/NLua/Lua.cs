@@ -276,12 +276,17 @@ end
 
 		public Lua ()
 		{
-			luaState = LuaLib.luaL_newstate ();	// steffenj: Lua 5.1.1 API change (lua_open is gone)
+			luaState = NewState();
 			LuaLib.luaL_openlibs (luaState);		// steffenj: Lua 5.1.1 API change (luaopen_base is gone, just open all libs right here)
 			Init (luaState);
 			// We need to keep this in a managed reference so the delegate doesn't get garbage collected
 			panicCallback = new LuaCore.lua_CFunction (PanicCallback);
 			LuaLib.lua_atpanic (luaState, panicCallback);
+		}
+
+		protected virtual LuaCore.lua_State NewState()
+		{
+			return LuaLib.luaL_newstate ();
 		}
 
 		/*
@@ -303,7 +308,7 @@ end
 			}
 		}
 
-		void Init (LuaCore.lua_State luaState)
+		protected virtual void Init (LuaCore.lua_State luaState)
 		{
 			LuaLib.lua_pushstring (luaState, "LUAINTERFACE LOADED");
 			LuaLib.lua_pushboolean (luaState, true);
